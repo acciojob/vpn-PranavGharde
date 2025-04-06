@@ -12,10 +12,13 @@ import java.util.List;
 
 @Service
 public class ConnectionServiceImpl implements ConnectionService {
+
     @Autowired
     UserRepository userRepository2;
+
     @Autowired
     ServiceProviderRepository serviceProviderRepository2;
+
     @Autowired
     ConnectionRepository connectionRepository2;
 
@@ -35,7 +38,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         List<ServiceProvider> serviceProviders = user.getServiceProviderList();
         ServiceProvider selectedProvider = null;
         Country selectedCountry = null;
-
         int minId = Integer.MAX_VALUE;
 
         for (ServiceProvider sp : serviceProviders) {
@@ -54,16 +56,22 @@ public class ConnectionServiceImpl implements ConnectionService {
             throw new Exception("Unable to connect");
         }
 
-        // Create connection
+        // Create and save the connection
         Connection connection = new Connection();
         connection.setUser(user);
         connection.setServiceProvider(selectedProvider);
+
+        connection = connectionRepository2.save(connection); // Save first to get connectionId
+
+        // Now update user's connectionList
         user.getConnectionList().add(connection);
 
-        user.setMaskedIp(selectedCountry.getCode() + "." + user.getId());
+        // Set masked IP including connection ID
+        user.setMaskedIp(selectedCountry.getCode() + "." + user.getId() + "." + connection.getId());
         user.setConnected(true);
 
         userRepository2.save(user);
+
         return user;
     }
 
@@ -88,7 +96,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         User receiver = userRepository2.findById(receiverId).get();
 
         String receiverIp = receiver.getMaskedIp();
-        String receiverCountryCode = null;
+        String receiverCountryCode;
 
         if (receiverIp != null) {
             receiverCountryCode = receiverIp.substring(0, 3);
@@ -96,7 +104,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             receiverCountryCode = receiver.getOriginalCountry().getCode();
         }
 
-        String senderCountryCode = null;
+        String senderCountryCode;
         if (sender.getConnected() && sender.getMaskedIp() != null) {
             senderCountryCode = sender.getMaskedIp().substring(0, 3);
         } else {
