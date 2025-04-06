@@ -6,6 +6,7 @@ import com.driver.services.ConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -70,6 +71,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         return user;
     }
 
+
     @Override
     public User disconnect(int userId) throws Exception {
         User user = userRepository2.findById(userId).orElse(null);
@@ -84,11 +86,13 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         user.setMaskedIp(null);
         user.setConnected(false);
+        user.setConnectionList(new ArrayList<>());  // clear all connections
 
         userRepository2.save(user);
 
         return user;
     }
+
 
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
