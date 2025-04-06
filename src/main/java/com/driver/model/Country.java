@@ -1,5 +1,7 @@
 package com.driver.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,9 +11,9 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String code; //IND, USA 3-letter
+    private String code;
 
-    private CountryName countryName; // No use @Enumerated annotation
+    private CountryName countryName;
 
     @ManyToOne
     @JoinColumn
@@ -19,6 +21,7 @@ public class Country {
 
     @OneToOne
     @JoinColumn
+    @JsonBackReference
     private User user;
 
     // Constructors
