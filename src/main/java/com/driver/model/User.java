@@ -1,10 +1,12 @@
 package com.driver.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -15,15 +17,22 @@ public class User {
     private Boolean connected;
     private String maskedIp;
 
-    @JoinColumn
     @ManyToMany
+    @JoinColumn
     private List<ServiceProvider> serviceProviderList;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Country originalCountry; //This field remains unaffected even when vpn connection is made
+    private Country originalCountry;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Connection> connectionList;
+
+    public User() {
+        this.serviceProviderList = new ArrayList<>();
+        this.connectionList = new ArrayList<>();
+    }
+
+    // Getter and Setter methods
 
     public int getId() {
         return id;
